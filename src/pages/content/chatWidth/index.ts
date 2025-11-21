@@ -161,32 +161,8 @@ export function startChatWidthAdjuster() {
 
   chrome.storage?.onChanged?.addListener(storageChangeHandler);
 
-  // Re-apply styles when DOM changes (for dynamic content)
-  // Use debouncing and cache the width to avoid storage reads
-  let debounceTimer: number | null = null;
-  const observer = new MutationObserver(() => {
-    if (debounceTimer !== null) {
-      clearTimeout(debounceTimer);
-    }
-    debounceTimer = window.setTimeout(() => {
-      // Use cached width instead of reading from storage
-      applyWidth(currentWidth);
-      debounceTimer = null;
-    }, 200);
-  });
-
-  // Observe the main conversation area for changes
-  const main = document.querySelector('main');
-  if (main) {
-    observer.observe(main, {
-      childList: true,
-      subtree: true,
-    });
-  }
-
   // Clean up on unload to prevent memory leaks
   window.addEventListener('beforeunload', () => {
-    observer.disconnect();
     removeStyles();
     // Remove storage listener
     try {
